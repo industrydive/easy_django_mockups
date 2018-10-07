@@ -1,0 +1,1 @@
+from easymockups.urls import urlpatterns
