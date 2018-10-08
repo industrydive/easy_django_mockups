@@ -22,14 +22,19 @@ def display_template(request, mockup_template_name):
 #	json_file = os.path.abspath('{}/mockups/jsondata/{}.json'.format(settings.PROJECT_ROOT, json_filename))
 #	print '\n\n\nJSON FILE IS {}'.format(json_file)
 
-#	js = template.loader.get_template(json_file)
-
-#	print '\n\n\n\n json hhopefully is {}'.format(js)
-
 	try:
-		with open(json_file, 'r') as opened_file:
-			jsonstuff = json.load(opened_file)
-			context.update(jsonstuff)
+		print '\n\n\n\n made it to the try!'
+		js = template.loader.get_template('mockups/{}.json'.format(json_filename))
+
+		print '\n\n\njs is {}'.format(js)
+		jsread = js.render()
+
+		print '\n\n\n\n json hhopefully is {}'.format(jsread)
+#			jsonstuff = json.load(opened_file)
+		jsonstuff = json.loads(jsread)
+		print '\n\n\n jsonstuff is {}'.format(jsonstuff)
+		context.update(jsonstuff)
+#		with open(json_filename, 'r') as opened_file:
 	except Exception as e:
 		error_message = 'JSON File appears to have some problems -- {}'.format(e)
 		messages.add_message(request, messages.ERROR, error_message)
