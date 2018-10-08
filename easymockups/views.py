@@ -28,5 +28,5 @@ def display_template(request, mockup_template_name):
 		error_message = 'JSON File appears to have some problems -- {}'.format(e)
 		messages.add_message(request, messages.ERROR, error_message)
  	
-	return render(request, mockup_template_name, context)
+	return render(request, 'mockups/' + mockup_template_name, context)
 
