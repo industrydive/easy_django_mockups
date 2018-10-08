@@ -10,15 +10,20 @@ from django.http import HttpResponse
 from django import template
 
 
+if hasattr(settings, 'MOCKUPS_DIR'):
+	MOCKUPS_DIR = settings.MOCKUPS_DIR
+else:
+	MOCKUPS_DIR = 'mockups'
 
 def display_template(request, mockup_template_name):
 	if not settings.DEBUG:
 		return HttpResponse(status=403)
+
 	context = {}
 	json_filename = os.path.splitext(mockup_template_name)[0]
 
 	try:
-		js = template.loader.get_template('mockups/{}.json'.format(json_filename))
+		js = template.loader.get_template('{}/{}.json'.format(MOCKUPS_DIR, json_filename))
 
 		jsread = js.render()
 
@@ -29,5 +34,5 @@ def display_template(request, mockup_template_name):
 		error_message = 'JSON File appears to have some problems -- {}'.format(e)
 		messages.add_message(request, messages.ERROR, error_message)
  	
-	return render(request, 'mockups/' + mockup_template_name, context)
+	return render(request, '{}/{}'.format(MOCKUPS_DIR, mockup_template_name), context)
 
