@@ -34,12 +34,14 @@ class TestFileCreation(TestCase):
         with open(file_path, 'w') as f:
             f.write(file_contents)
 
-        getreq = self.client.get(reverse('display_template', kwargs={'mockup_template_name': 'testsuitefile.html'}))
+        testsuite_reverse = reverse('display_template', kwargs={'mockup_template_name': 'testsuitefile.html'})
+
+        getreq = self.client.get(testsuite_reverse)
         self.assertEqual(200, getreq.status_code)
 
         os.remove(file_path)
 
-        resp = self.client.get(reverse('display_template', kwargs={'mockup_template_name': 'testsuitefile.html'}))
+        resp = self.client.get(testsuite_reverse)
         
         self.assertEqual(404, resp.status_code)
 
