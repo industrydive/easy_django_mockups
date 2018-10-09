@@ -5,20 +5,49 @@ from django.test import TestCase, Client
 from easymockups.views import display_template
 import test_settings
 from django.urls import reverse
+import os.path
+from django.template import TemplateDoesNotExist
 
-#if not settings.configured:
-#    settings.configure(default_settings=test_settings, DEBUG=True)
 django.setup()
-#settings.configure()
 
-class TestJoke(TestCase):
+
+class TestResponseValid(TestCase):
     def setUp(self):
         self.client = Client()
 
 
 
-    def test_is_string(self):
-        s = 'hi'
-
+    def test_200_response(self):
         getreq = self.client.get(reverse('display_template', kwargs={'mockup_template_name': 'test.html'}))
         self.assertEqual(200, getreq.status_code)
+
+
+class TestFileCreation(TestCase):
+    def setUp(self):
+        pass
+
+    def test_create_file(self):
+        filename='testsuitefile.html'
+        file_contents = '<html><body>Hello! Im a test file made for the test suite!!</body></html>'
+        file_path = os.path.join('easymockups', settings.MOCKUPS_DIR, filename)
+
+        with open(file_path, 'w') as f:
+            f.write(file_contents)
+
+        getreq = self.client.get(reverse('display_template', kwargs={'mockup_template_name': 'testsuitefile.html'}))
+        self.assertEqual(200, getreq.status_code)
+
+        os.remove(file_path)
+
+        resp = self.client.get(reverse('display_template', kwargs={'mockup_template_name': 'testsuitefile.html'}))
+        
+        self.assertEqual(404, resp.status_code)
+
+
+
+class TestFileLocation(TestCase):
+    def setUp(self):
+        pass
+
+    def test_found_file(self):
+        pass

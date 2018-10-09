@@ -7,6 +7,7 @@ from django.conf import settings
 from django.shortcuts import render
 from django.contrib import messages
 from django.http import HttpResponse
+from django.template import TemplateDoesNotExist
 from django import template
 
 
@@ -34,5 +35,8 @@ def display_template(request, mockup_template_name):
 		error_message = 'JSON File appears to have some problems -- {}'.format(e)
 		messages.add_message(request, messages.ERROR, error_message)
  	
-	return render(request, '{}/{}'.format(MOCKUPS_DIR, mockup_template_name), context)
+	try:
+		return render(request, '{}/{}'.format(MOCKUPS_DIR, mockup_template_name), context)
+	except TemplateDoesNotExist as error:
+		return HttpResponse(status=404)
 
