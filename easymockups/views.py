@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.template import TemplateDoesNotExist
 from django import template
+from .models import Mockup
 
 # TODO: maybe move this to something in the settings file where we retrieve the user's settings
 # Maybe think about something more like DDT: https://github.com/jazzband/django-debug-toolbar/blob/master/debug_toolbar/settings.py
@@ -31,11 +32,8 @@ def display_template(request, mockup_template_name):
 	json_filename = os.path.splitext(mockup_template_name)[0]
 
 	try:
-		js = template.loader.get_template('{}/{}.json'.format(MOCKUPS_DIR, json_filename))
-
-		jsread = js.render()
-
-		jsonstuff = json.loads(jsread)
+		mock = Mockup()
+		jsonstuff = mock.render_associated_json_file(json_filename)
 		context.update(jsonstuff)
 
 	except ValueError as e:
