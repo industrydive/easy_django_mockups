@@ -9,18 +9,11 @@ jobs:
     working_directory: ~/easy_django_mockups
     steps:
       - checkout
+      - run: virtualenv venv
+      - run: pip install Django==1.11
+      - run: pip install tox
+      - store_test_results:
+          path: ./test-output
+      - store_artifacts:
+          path: ./test-output
 
-      - run:
-          name: display docker info
-          command: |
-            docker info
-      - run:
-          name: run tests
-          command: |
-            make pythonqa
-            make test
-      - deploy:
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              git config user.email "tech.team@industrydive.com" && git config user.name "Robert Dive" && git tag -a v$(python setup.py --version) -m "$CIRCLE_BUILD_URL" && git push --tags
-            fi
