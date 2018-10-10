@@ -12,17 +12,6 @@ import json
 django.setup()
 
 
-class TestResponseValid(TestCase):
-    def setUp(self):
-        self.client = Client()
-
-
-
-    def test_200_response(self):
-        getreq = self.client.get(reverse('display_template', kwargs={'mockup_template_name': 'test.html'}))
-        self.assertEqual(200, getreq.status_code)
-
-
 class TestFileCreation(TestCase):
     def setUp(self):
         pass
