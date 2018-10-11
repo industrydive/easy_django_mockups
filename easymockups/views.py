@@ -31,20 +31,14 @@ def display_template(request, mockup_template_name):
 	context = {}
 	json_filename = os.path.splitext(mockup_template_name)[0]
 
-	try:
-		mock = Mockup()
-		jsonstuff = mock.render_associated_json_file(json_filename)
-		context.update(jsonstuff)
+	mock = Mockup()
+	mock.load_related_json(json_filename)
 
-	except ValueError as e:
-		if JSON_ERRORS_ENABLED:
-			error_message = 'JSON File appears to have some problems -- {}'.format(e)
-			messages.add_message(request, messages.ERROR, error_message)
-	except TemplateDoesNotExist as e:
-		if JSON_ERRORS_ENABLED:
-			error_message = 'JSON File appears to have some problems -- {}'.format(e)
-			messages.add_message(request, messages.ERROR, error_message)
-
+	if mock.json:
+		context.update(mock.json)
+	elif mock.error_message and JSON_ERRORS_ENABLED:
+		messages.add_message(request, messages.ERROR, mock.error_message)
+ 
 	try:
 		return render(request, '{}/{}'.format(MOCKUPS_DIR, mockup_template_name), context)
 	except TemplateDoesNotExist as error:

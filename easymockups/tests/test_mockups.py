@@ -1,18 +1,19 @@
 #from unittest import TestCase
 import django
 from django.conf import settings
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from easymockups.views import display_template
 import test_settings
 from django.urls import reverse
 import os.path
 from django.template import TemplateDoesNotExist
 import json
+from easymockups.models import Mockup
 
 django.setup()
 
 
-class TestFileCreation(TestCase):
+class TestDebugTrue(TestCase):
     def setUp(self):
         self.filename_base='testsuitefile'
         self.html_file_path = os.path.join('easymockups', settings.MOCKUPS_DIR, '{}.html'.format(self.filename_base))
@@ -52,4 +53,29 @@ class TestFileCreation(TestCase):
         os.remove(self.html_file_path)
         resp = self.client.get(self.testsuite_urlpath)
         self.assertEqual(404, resp.status_code)
+
+
+
+
+class TestDebugFalse(TestCase):
+    def setUp(self):
+        self.filename_base='testsuitefile'
+        self.html_file_path = os.path.join('easymockups', settings.MOCKUPS_DIR, '{}.html'.format(self.filename_base))
+        self.json_file_path = os.path.join('easymockups', settings.MOCKUPS_DIR, '{}.json'.format(self.filename_base))
+        self.testsuite_urlpath = reverse('display_template', kwargs={'mockup_template_name': 'testsuitefile.html'})
+
+
+    @override_settings(DEBUG=False)
+    def test403(self):
+        resp = self.client.get(self.testsuite_urlpath)
+        self.assertEqual(403, resp.status_code)
+        self.assertNotIn('this is some test json!', resp.content.decode("utf-8"))
+
+
+class TestMockupModel(TestCase):
+    def setUp(self):
+        pass
+
+
+
 
