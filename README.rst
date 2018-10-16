@@ -4,6 +4,20 @@ A library to allow for easy mockups using the power of Django templates
 
 To Install
 ==========
+clone this repo to somewhere on your computer. 
+
+``virtualenv venv``
+
+``source venv/bin/activate``
+
+``pip install -r requirements.txt``
+
+``python setup.py sdist``
+
+After the above commands are run, you should have a tar.gz file under the dist/ directory. From there, pip install this package into your django project by running the following command, replacing PATH/TO/ with whatever path leads to the easymockups-0.1.tar.gz file.
+
+``pip install PATH/TO/dist/easymockups-0.1.tar.gz``
+
 ``pip install easymockups``
 
 ``add the new module to your INSTALLED_APPS settings``
