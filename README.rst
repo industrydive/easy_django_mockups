@@ -18,10 +18,12 @@ After the above commands are run, you should have a tar.gz file under the dist/ 
 
 ``pip install PATH/TO/dist/easymockups-0.1.tar.gz``
 
-``pip install easymockups``
+Then add the new module to your INSTALLED_APPS settings, and add 
 
-``add the new module to your INSTALLED_APPS settings``
+``url(r'^', include('easymockups'))``
 
-``add 'url(r'^', include('easymockups'))' to your root-level urls.py``
+to your root-level urls.py
 
-This package requires you to create a 'mockups' directory inside any 'templates' directory you normally save your django templates to. Any template you put into that mockups directory can be accessed directoy via the url path /mockups/[templatename].html. Note that this only works if you have listed your own relevant apps in the INSTALLED_APPS settings.py setting.
+From there, you'll need to create a 'mockups' directory inside any 'templates' directory you normally save your django templates to. Any template you put into that mockups directory can be accessed directoy via the url path /mockups/[templatename].html, where [templatename] is the name of the file you just created. You can also add a JSON file that follows the same naming pattern and the template should include the json objects as primitive mock django models.
+
+
