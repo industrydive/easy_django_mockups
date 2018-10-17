@@ -3,6 +3,10 @@ from django.db import models
 from django import template
 from django.conf import settings
 from django.template import TemplateDoesNotExist
+from django.template.utils import get_app_template_dirs
+from django.template.loaders.app_directories import Loader
+from django.template.engine import Engine
+from django.apps import apps
 
 # Create your models here.
 
@@ -23,15 +27,47 @@ class Mockup(object):
 		self.json = None
 		self.error_message = None
 
+
 	def create_html_file(self):
 		return
 
 	def load_related_json(self, filename_base):
 		try:
-			js = template.loader.get_template('{}/{}.json'.format(MOCKUPS_DIR, filename_base))
-			jsread = js.render()
-			jsonstuff = json.loads(jsread)
-			self.json = jsonstuff
+
+			loader = JSONLoader('/' + filename_base + '.json')
+			jsonstuff = loader.render_json_to_string()
+			return jsonstuff
+
 		except (TemplateDoesNotExist, ValueError) as e:
 			self.error_message = 'JSON File appears to have some problems -- {}'.format(e)
+
+
+class JSONLoader(object):
+	use_os_path = False
+	use_template_loader = False
+
+	def __init__(self, json_path):
+		self.contents = '{}'
+
+		paths = get_app_template_dirs(MOCKUPS_DIR)
+		print('\n\n\n\n\n TPATHS IS {}'.format(paths))
+
+
+		for path in paths:
+			thepath = paths[0] + json_path
+
+			try:
+				with open(thepath, 'r') as f:
+					self.contents = f.read()
+			except FileNotFoundError as e:
+				pass
+
+
+	def render_json_to_string(self):
+
+		return json.loads(self.contents)
+
+
+
+
 

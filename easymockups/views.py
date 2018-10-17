@@ -32,10 +32,10 @@ def display_template(request, mockup_template_name):
 	json_filename = os.path.splitext(mockup_template_name)[0]
 
 	mock = Mockup()
-	mock.load_related_json(json_filename)
+	json_stuff = mock.load_related_json(json_filename)
 
-	if mock.json:
-		context.update(mock.json)
+	if json_stuff:
+		context.update(json_stuff)
 	elif mock.error_message and JSON_ERRORS_ENABLED:
 		messages.add_message(request, messages.ERROR, mock.error_message)
  

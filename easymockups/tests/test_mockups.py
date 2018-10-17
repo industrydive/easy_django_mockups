@@ -8,7 +8,8 @@ from django.urls import reverse
 import os.path
 from django.template import TemplateDoesNotExist
 import json
-from easymockups.models import Mockup
+from easymockups.models import Mockup, JSONLoader
+from django.apps import apps
 
 django.setup()
 
@@ -38,7 +39,7 @@ class TestDebugTrue(TestCase):
         resp = self.client.get(self.testsuite_urlpath)
         self.assertEqual(200, resp.status_code)
         self.assertIn('this is some test json!', resp.content.decode("utf-8"))
-
+        print('\n\n\n\n\n\n respose body was {}'.format(resp.content.decode('utf-8')))
 
         # Test taht even though we remove the json file, we sill get a valid reesponse bc the HTML file still exists
         # We only test for a substring at the end of the html_contents string because the django renderer
@@ -48,6 +49,7 @@ class TestDebugTrue(TestCase):
         self.assertEqual(200, resp.status_code)
         self.assertIn('exclamation points!!  </body', resp.content.decode('utf-8'))
 
+        print('\n\n\n\n\n\n respose body was {}'.format(resp.content.decode('utf-8')))
 
         # Test that removing the HTML file will cause the page to 404
         os.remove(self.html_file_path)
@@ -77,5 +79,32 @@ class TestMockupModel(TestCase):
         pass
 
 
+class TestJsonLoader(TestCase):
+
+#    TEMPLATES = [
+#        {
+#            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+#            'DIRS': ['/templates', '/mockups'],
+#            'APP_DIRS': True,
+#            'OPTIONS': {
+#                'context_processors': [
+#                    'django.template.context_processors.debug',
+#                    'django.template.context_processors.request',
+#                    'django.contrib.auth.context_processors.auth',
+#                    'django.contrib.messages.context_processors.messages',
+#                ],
+#            },
+#        },
+#    ]
+
+    def setUp(self):
+        pass
+
+ #   @override_settings(TEMPLATES=TEMPLATES)
+    def test_file_open(self):
+        assertresults = {'testvar': 'im a testvar'}
+        l = JSONLoader('/test.json')
+        json_contents = l.render_json_to_string()
+        self.assertEqual(assertresults, json_contents)
 
 
