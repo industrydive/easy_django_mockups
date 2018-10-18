@@ -37,17 +37,21 @@ def display_template(request, mockup_template_name):
 	paths = get_app_template_dirs('templates')
 	paths += get_app_template_dirs(MOCKUPS_DIR)
 
+	contents = None
 
 	for path in paths:
 		thepath = Path(path, 'mockups', mockup_template_name)
 		try:
 			with open(thepath, 'r') as f:
-				template = Template(f.read())
+				contents = f.read()
 #				print('\n\n\n TEMPLATE CONTENTS ARE {}'.format(contents))
 		except FileNotFoundError as e:
 			print('could not openn(thepath, r), exceptoin was {}\n==================='.format(e))
 			continue
-
+	if contents:
+		template = Template(contents)
+	else:
+		return HttpResponse(status=404)
 
 
 	context = RequestContext(request, {})
