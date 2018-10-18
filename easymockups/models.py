@@ -7,6 +7,7 @@ from django.template.utils import get_app_template_dirs
 from django.template.loaders.app_directories import Loader
 from django.template.engine import Engine
 from django.apps import apps
+from pathlib import Path
 
 # Create your models here.
 
@@ -34,7 +35,7 @@ class Mockup(object):
 	def load_related_json(self, filename_base):
 		try:
 
-			loader = JSONLoader('/' + filename_base + '.json')
+			loader = JSONLoader(filename_base + '.json')
 			jsonstuff = loader.render_json_to_string()
 			return jsonstuff
 
@@ -49,18 +50,17 @@ class JSONLoader(object):
 	def __init__(self, json_path):
 		self.contents = '{}'
 
-		paths = get_app_template_dirs(MOCKUPS_DIR)
-		print('\n\n\n\n\n TPATHS IS {}'.format(paths))
-
+		paths = get_app_template_dirs('templates')
+		paths += get_app_template_dirs(MOCKUPS_DIR)
 
 		for path in paths:
-			thepath = paths[0] + json_path
-
+			thepath = Path(path, 'mockups', json_path)
 			try:
 				with open(thepath, 'r') as f:
 					self.contents = f.read()
 			except FileNotFoundError as e:
-				pass
+				print('could not openn(thepath, r), exceptoin was {}\n==================='.format(e))
+				continue
 
 
 	def render_json_to_string(self):

@@ -7,9 +7,14 @@ from django.conf import settings
 from django.shortcuts import render
 from django.contrib import messages
 from django.http import HttpResponse
-from django.template import TemplateDoesNotExist
+from django.template import TemplateDoesNotExist, RequestContext
 from django import template
 from .models import Mockup
+from django.template.base import Template
+from django.template.utils import get_app_template_dirs
+from pathlib import Path
+from django.template.response import TemplateResponse
+
 
 # TODO: maybe move this to something in the settings file where we retrieve the user's settings
 # Maybe think about something more like DDT: https://github.com/jazzband/django-debug-toolbar/blob/master/debug_toolbar/settings.py
@@ -28,7 +33,24 @@ def display_template(request, mockup_template_name):
 	if not settings.DEBUG:
 		return HttpResponse(status=403)
 
-	context = {}
+
+	paths = get_app_template_dirs('templates')
+	paths += get_app_template_dirs(MOCKUPS_DIR)
+
+
+	for path in paths:
+		thepath = Path(path, 'mockups', mockup_template_name)
+		try:
+			with open(thepath, 'r') as f:
+				template = Template(f.read())
+#				print('\n\n\n TEMPLATE CONTENTS ARE {}'.format(contents))
+		except FileNotFoundError as e:
+			print('could not openn(thepath, r), exceptoin was {}\n==================='.format(e))
+			continue
+
+
+
+	context = RequestContext(request, {})
 	json_filename = os.path.splitext(mockup_template_name)[0]
 
 	mock = Mockup()
@@ -40,7 +62,8 @@ def display_template(request, mockup_template_name):
 		messages.add_message(request, messages.ERROR, mock.error_message)
  
 	try:
-		return render(request, '{}/{}'.format(MOCKUPS_DIR, mockup_template_name), context)
+		return HttpResponse(template.render(context))
+#		return render(request, 'mockups/' + mockup_template_name, context)
 	except TemplateDoesNotExist as error:
 		return HttpResponse(status=404)
 
