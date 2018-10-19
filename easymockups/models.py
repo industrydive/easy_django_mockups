@@ -8,6 +8,7 @@ from django.template.loaders.app_directories import Loader
 from django.template.engine import Engine
 from django.apps import apps
 from pathlib import Path
+import os.path
 
 
 if hasattr(settings, 'MOCKUPS_DIR'):
@@ -35,11 +36,11 @@ class Mockup(object):
 
 	def read_html_file(self):
 		for path in self.paths:
-			thepath = Path(path, 'mockups', self.mockup_template_name)
+			thepath = os.path.join(path, 'mockups', self.mockup_template_name)
 			try:
 				with open(thepath, 'r') as f:
 					self.contents = f.read()
-			except FileNotFoundError as e:
+			except Exception as e:
 				continue
 
 #		return self.contents
@@ -68,11 +69,11 @@ class JSONLoader(object):
 		paths += get_app_template_dirs(MOCKUPS_DIR)
 
 		for path in paths:
-			thepath = Path(path, 'mockups', json_path)
+			thepath = os.path.join(path, 'mockups', json_path)
 			try:
 				with open(thepath, 'r') as f:
 					self.contents = f.read()
-			except FileNotFoundError as e:
+			except Exception as e:
 				continue
 
 

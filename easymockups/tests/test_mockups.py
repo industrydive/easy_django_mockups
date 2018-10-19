@@ -36,7 +36,6 @@ class TestDebugTrue(TestCase):
 
     def test_response_200_with_json(self):
         # Test the template renderinng works with the json file we created in the above lines
-        print('\n\n\ntestsuite_urlpath is {}'.format(self.testsuite_urlpath))
         resp = self.client.get(self.testsuite_urlpath)
         self.assertEqual(200, resp.status_code)
         self.assertIn('this is some test json!', resp.content.decode("utf-8"))
