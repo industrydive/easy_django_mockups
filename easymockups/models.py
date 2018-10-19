@@ -9,7 +9,6 @@ from django.template.engine import Engine
 from django.apps import apps
 from pathlib import Path
 
-# Create your models here.
 
 if hasattr(settings, 'MOCKUPS_DIR'):
 	MOCKUPS_DIR = settings.MOCKUPS_DIR
@@ -27,37 +26,35 @@ class Mockup(object):
 	def __init__(self, mockup_template_name):
 		self.json = None
 		self.error_message = None
+		self.contents = None
 
-		paths = get_app_template_dirs('templates')
-		paths += get_app_template_dirs(MOCKUPS_DIR)
+		self.paths = get_app_template_dirs('templates')
+		self.paths += get_app_template_dirs(MOCKUPS_DIR)
+		self.mockup_template_name = mockup_template_name
 
-		contents = None
-		for path in paths:
-			thepath = Path(path, 'mockups', mockup_template_name)
+
+	def read_html_file(self):
+		for path in self.paths:
+			thepath = Path(path, 'mockups', self.mockup_template_name)
 			try:
 				with open(thepath, 'r') as f:
-					contents = f.read()
-#					print('\n\n\n TEMPLATE CONTENTS ARE {}'.format(contents))
+					self.contents = f.read()
 			except FileNotFoundError as e:
-				print('could not openn(thepath, r), exceptoin was {}\n==================='.format(e))
 				continue
 
-		self.contents = contents
+#		return self.contents
 
-
-
-	def create_html_file(self):
-		return
 
 	def load_related_json(self, filename_base):
 		try:
 
 			loader = JSONLoader(filename_base + '.json')
-			jsonstuff = loader.render_json_to_string()
+			jsonstuff = loader.load_json_to_dict()
 			return jsonstuff
 
 		except (TemplateDoesNotExist, ValueError) as e:
-			self.error_message = 'JSON File appears to have some problems -- {}'.format(e)
+			if JSON_ERRORS_ENABLED:
+				self.error_message = 'JSON File appears to have some problems -- {}'.format(e)
 
 
 class JSONLoader(object):
@@ -76,11 +73,10 @@ class JSONLoader(object):
 				with open(thepath, 'r') as f:
 					self.contents = f.read()
 			except FileNotFoundError as e:
-				print('could not openn(thepath, r), exceptoin was {}\n==================='.format(e))
 				continue
 
 
-	def render_json_to_string(self):
+	def load_json_to_dict(self):
 
 		return json.loads(self.contents)
 

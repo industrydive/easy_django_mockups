@@ -59,15 +59,8 @@ class TestDebugTrue(TestCase):
         self.assertEqual(404, resp.status_code)
 
 
-
-
-class TestDebugFalse(TestCase):
-    def setUp(self):
-       self.testsuite_urlpath = reverse('display_template', kwargs={'mockup_template_name': 'testsuitefile.html'})
-
-
     @override_settings(DEBUG=False)
-    def test403(self):
+    def test_debug_false_403(self):
         resp = self.client.get(self.testsuite_urlpath)
         self.assertEqual(403, resp.status_code)
         self.assertNotIn('this is some test json!', resp.content.decode("utf-8"))
@@ -80,12 +73,13 @@ class TestMockupModel(TestCase):
 
 class TestJsonLoader(TestCase):
     def setUp(self):
-        pass
+        with open(json_file_path, 'w') as f:
+            json.dump({"testvar": "this is some test json!"}, f)
 
     def test_file_open(self):
-        assertresults = {'testvar': 'im a testvar'}
-        l = JSONLoader('test.json')
-        json_contents = l.render_json_to_string()
+        assertresults = {'testvar': 'this is some test json!'}
+        l = JSONLoader('testsuitefile.json')
+        json_contents = l.load_json_to_dict()
         self.assertEqual(assertresults, json_contents)
 
 
