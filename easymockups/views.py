@@ -33,38 +33,25 @@ def display_template(request, mockup_template_name):
 	if not settings.DEBUG:
 		return HttpResponse(status=403)
 
-
-	paths = get_app_template_dirs('templates')
-	paths += get_app_template_dirs(MOCKUPS_DIR)
-
 	contents = None
+	context = RequestContext(request, {})
+	json_filename = os.path.splitext(mockup_template_name)[0]
 
-	for path in paths:
-		thepath = Path(path, 'mockups', mockup_template_name)
-		try:
-			with open(thepath, 'r') as f:
-				contents = f.read()
-#				print('\n\n\n TEMPLATE CONTENTS ARE {}'.format(contents))
-		except FileNotFoundError as e:
-			print('could not openn(thepath, r), exceptoin was {}\n==================='.format(e))
-			continue
-	if contents:
-		template = Template(contents)
+	mock = Mockup(mockup_template_name)
+	html_contents = mock.contents
+	if html_contents:
+		template = Template(html_contents)
 	else:
 		return HttpResponse(status=404)
 
 
-	context = RequestContext(request, {})
-	json_filename = os.path.splitext(mockup_template_name)[0]
-
-	mock = Mockup()
 	json_stuff = mock.load_related_json(json_filename)
-
 	if json_stuff:
 		context.update(json_stuff)
 	elif mock.error_message and JSON_ERRORS_ENABLED:
 		messages.add_message(request, messages.ERROR, mock.error_message)
  
+
 	try:
 		return HttpResponse(template.render(context))
 #		return render(request, 'mockups/' + mockup_template_name, context)
