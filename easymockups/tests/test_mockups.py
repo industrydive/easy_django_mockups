@@ -21,9 +21,6 @@ class TestDebugTrue(TestCase):
     def setUp(self):
         self.testsuite_urlpath = reverse('display_template', kwargs={'mockup_template_name': 'testsuitefile.html'})
 
-    def test_create_file(self):
-
-
         with open(html_file_path, 'w') as f:
             html_contents = """
                 <html><body>We should see the output from "testvar" in the json file 
@@ -35,27 +32,28 @@ class TestDebugTrue(TestCase):
             json.dump({"testvar": "this is some test json!"}, f)
 
 
+
+
+    def test_response_200_with_json(self):
         # Test the template renderinng works with the json file we created in the above lines
         print('\n\n\ntestsuite_urlpath is {}'.format(self.testsuite_urlpath))
         resp = self.client.get(self.testsuite_urlpath)
         self.assertEqual(200, resp.status_code)
         self.assertIn('this is some test json!', resp.content.decode("utf-8"))
-#        print('\n\n\n\n\n\n respose body was {}'.format(resp.content.decode('utf-8')))
 
+
+    def test_remove_json_file(self):
         # Test taht even though we remove the json file, we sill get a valid reesponse bc the HTML file still exists
         # We only test for a substring at the end of the html_contents string because the django renderer
         # should have stripped out the {{ testvar }} part during renderinng, since the json object doesnt exist any more
-
-#        print('\nbout to test after removing self.json_file_path of {}'.format(json_file_path))
         os.remove(json_file_path)
         resp = self.client.get(self.testsuite_urlpath)
         self.assertEqual(200, resp.status_code)
         self.assertIn('exclamation points!!  </body', resp.content.decode('utf-8'))
 
-#        print('\n\n\n\n\n\n respose body was {}'.format(resp.content.decode('utf-8')))
 
+    def test_no_html_file(self):
         # Test that removing the HTML file will cause the page to 404
-#        print('\nbout to test after removing self.html_file_path of {}'.format(html_file_path))
         os.remove(html_file_path)
         resp = self.client.get(self.testsuite_urlpath)
         self.assertEqual(404, resp.status_code)
