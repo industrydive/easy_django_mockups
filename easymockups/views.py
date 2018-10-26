@@ -27,10 +27,13 @@ def display_template(request, mockup_template_name):
 
 	mock = Mockup(mockup_template_name)
 	mock.read_html_file()
-	html_contents = mock.contents
-	if html_contents:
-		template = Template(html_contents)
+
+	print 'JUST TRIED READ HTML FILE'
+	if mock.html:
+		# print '\n\n\n\n\n\n MOCK> HTML WS {}'.format(mock.html)
+		template = mock.html
 	else:
+		print 'COULD NOT GET THE MOCK.HTML CONTENTS'
 		return HttpResponse(status=404)
 
 

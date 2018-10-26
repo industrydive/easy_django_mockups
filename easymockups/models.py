@@ -4,7 +4,8 @@ from django import template
 from django.conf import settings
 from django.template import TemplateDoesNotExist
 from django.template.utils import get_app_template_dirs
-from django.template.loaders.app_directories import Loader
+#from django.template.loaders.app_directories import Loader
+from django.template.loaders.filesystem import Loader as FilesystemLoader
 from django.template.engine import Engine
 from django.apps import apps
 from pathlib import Path
@@ -22,35 +23,74 @@ else:
 	JSON_ERRORS_ENABLED = True
 
 
+DIRS = getattr(settings, 'TEMPLATES', [])
+dirs = [os.path.join(dir, MOCKUPS_DIR) for dir in DIRS[0]['DIRS']]
+
+from django.template import Engine
+from django.template.base import Origin
+
+
+class Loader(FilesystemLoader):
+
+    def get_dirs(self):
+    	if MOCKUPS_DIR:
+	        return get_app_template_dirs('templates/{}'.format(MOCKUPS_DIR))
+    	else:
+	        return get_app_template_dirs('templates')
+
+
+
+
+
 class Mockup(object):
 
 	def __init__(self, mockup_template_name):
 		self.json = None
 		self.error_message = None
-		self.contents = None
 
-		self.paths = get_app_template_dirs('templates')
-		self.paths += get_app_template_dirs(MOCKUPS_DIR)
+
+
+
+		self.engine = Engine(dirs=dirs, app_dirs=True)
+#		print '\n\n\n DIRS IS {}'.format(dirs)
+		self.loader = self.engine.find_template_loader('easymockups.models.Loader')
+
+#		allpaths = [origin.name for origin in self.loader.get_template_sources('testsuitefile.html')]
+#		print '\n\n\n\n allpaths are {}'.format(allpaths)
+#		import pdb;pdb.set_trace()
+
+#		self.paths = get_app_template_dirs('templates')
+#		self.paths += get_app_template_dirs(MOCKUPS_DIR)
+#		self.paths = allpaths
 		self.mockup_template_name = mockup_template_name
+		self.html = ''
 
 
 	def read_html_file(self):
-		for path in self.paths:
-			thepath = os.path.join(path, 'mockups', self.mockup_template_name)
-			try:
-				with open(thepath, 'r') as f:
-					self.contents = f.read()
-			except Exception as e:
-				continue
-
-#		return self.contents
-
+#		for path in self.paths:
+#			thepath = os.path.join(path, 'mockups', self.mockup_template_name)
+#			try:
+#				with open(thepath, 'r') as f:
+#					self.html = f.read()
+#			except Exception as e:
+#				continue
+		try:
+			print '\n\n------\ntrying to open html file {}'.format(self.mockup_template_name)
+			print 'dirs was {}'.format(self.engine.dirs)
+			print 'app_dirs was {}'.format(self.engine.app_dirs)
+#			print 'tryiing to open files in path {}'.format(self.paths)
+#			import pdb; pdb.set_trace()
+			self.html = self.loader.get_template(self.mockup_template_name)
+		except Exception as e:
+			print '\n\n COULD NOT OPEN THE FILE, ERROR WAS {}'.format(e)
+			self.html = ''
 
 	def load_related_json(self, filename_base):
 		try:
 
 			loader = JSONLoader(filename_base + '.json')
-			jsonstuff = loader.load_json_to_dict()
+			loader.load_json_to_dict()
+			jsonstuff = loader.get_json()
 			return jsonstuff
 
 		except (TemplateDoesNotExist, ValueError) as e:
@@ -64,24 +104,24 @@ class JSONLoader(object):
 
 	def __init__(self, json_path):
 		self.contents = '{}'
+		self.json = {}
 
 		paths = get_app_template_dirs('templates')
 		paths += get_app_template_dirs(MOCKUPS_DIR)
 
 		for path in paths:
-			thepath = os.path.join(path, 'mockups', json_path)
+			thepath = os.path.join(path, json_path)
+			print '\n\n ===\ntrying to open file at {}'.format(thepath)
 			try:
 				with open(thepath, 'r') as f:
 					self.contents = f.read()
 			except Exception as e:
 				continue
+#			self.html = self.loader.get_template(self.mockup_template_name)
 
 
 	def load_json_to_dict(self):
+		self.json = json.loads(self.contents)
 
-		return json.loads(self.contents)
-
-
-
-
-
+	def get_json(self):
+		return self.json
