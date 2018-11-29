@@ -28,12 +28,9 @@ def display_template(request, mockup_template_name):
 	mock = Mockup(mockup_template_name)
 	mock.read_html_file()
 
-	print 'JUST TRIED READ HTML FILE'
 	if mock.html:
-		# print '\n\n\n\n\n\n MOCK> HTML WS {}'.format(mock.html)
 		template = mock.html
 	else:
-		print 'COULD NOT GET THE MOCK.HTML CONTENTS'
 		return HttpResponse(status=404)
 
 
@@ -46,7 +43,6 @@ def display_template(request, mockup_template_name):
 
 	try:
 		return HttpResponse(template.render(context))
-#		return render(request, 'mockups/' + mockup_template_name, context)
 	except TemplateDoesNotExist as error:
 		return HttpResponse(status=404)
 

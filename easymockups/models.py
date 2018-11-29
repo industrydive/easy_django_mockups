@@ -33,13 +33,11 @@ from django.template.base import Origin
 class Loader(FilesystemLoader):
 
     def get_dirs(self):
+    	# TODO: update this to append to self.dirs, instead of overriding completely
     	if MOCKUPS_DIR:
 	        return get_app_template_dirs('templates/{}'.format(MOCKUPS_DIR))
     	else:
 	        return get_app_template_dirs('templates')
-
-
-
 
 
 class Mockup(object):
@@ -48,38 +46,19 @@ class Mockup(object):
 		self.json = None
 		self.error_message = None
 
-
-
-
 		self.engine = Engine(dirs=dirs, app_dirs=True)
-#		print '\n\n\n DIRS IS {}'.format(dirs)
 		self.loader = self.engine.find_template_loader('easymockups.models.Loader')
 
-#		allpaths = [origin.name for origin in self.loader.get_template_sources('testsuitefile.html')]
-#		print '\n\n\n\n allpaths are {}'.format(allpaths)
-#		import pdb;pdb.set_trace()
-
-#		self.paths = get_app_template_dirs('templates')
-#		self.paths += get_app_template_dirs(MOCKUPS_DIR)
-#		self.paths = allpaths
 		self.mockup_template_name = mockup_template_name
 		self.html = ''
 
 
 	def read_html_file(self):
-#		for path in self.paths:
-#			thepath = os.path.join(path, 'mockups', self.mockup_template_name)
-#			try:
-#				with open(thepath, 'r') as f:
-#					self.html = f.read()
-#			except Exception as e:
-#				continue
+
 		try:
 			print '\n\n------\ntrying to open html file {}'.format(self.mockup_template_name)
 			print 'dirs was {}'.format(self.engine.dirs)
 			print 'app_dirs was {}'.format(self.engine.app_dirs)
-#			print 'tryiing to open files in path {}'.format(self.paths)
-#			import pdb; pdb.set_trace()
 			self.html = self.loader.get_template(self.mockup_template_name)
 		except Exception as e:
 			print '\n\n COULD NOT OPEN THE FILE, ERROR WAS {}'.format(e)
