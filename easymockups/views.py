@@ -28,8 +28,8 @@ def display_template(request, mockup_template_name):
 	mock = Mockup(mockup_template_name)
 	mock.read_html_file()
 
-	if mock.html:
-		template = mock.html
+	if mock.template_obj:
+		template = mock.template_obj
 	else:
 		return HttpResponse(status=404)
 
