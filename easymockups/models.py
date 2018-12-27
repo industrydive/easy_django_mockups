@@ -9,7 +9,6 @@ from django.template.loaders.filesystem import Loader as FilesystemLoader
 from django.template.loaders.base import Loader as BaseLoader
 from django.template.engine import Engine
 from django.apps import apps
-from pathlib import Path
 import os.path
 from django.template import Origin, TemplateDoesNotExist
 from django.utils._os import safe_join
@@ -23,8 +22,6 @@ if hasattr(settings, 'JSON_ERRORS_ENABLED'):
 	JSON_ERRORS_ENABLED = settings.JSON_ERRORS_ENABLED
 else:
 	JSON_ERRORS_ENABLED = True
-
-
 
 from django.template import Engine
 from django.template.base import Origin
@@ -68,7 +65,6 @@ class Loader(BaseLoader):
 			)
 
 
-
 class Mockup(object):
 
 	def __init__(self, mockup_template_name):
@@ -79,6 +75,9 @@ class Mockup(object):
 		TEMPLATE_DIRS = getattr(settings, 'TEMPLATES', [])
 		dirs = [os.path.join(dir, MOCKUPS_DIR) for dir in TEMPLATE_DIRS[0]['DIRS']]
 
+		# THis turns out to be the key. We are manually finding out which dirs to pass to Engine
+		# which lets get_template_sources() find the templates correctly. could probably override
+		# get_template_sources() to find better templates
 		self.engine = Engine(dirs=dirs, app_dirs=True)
 		self.loader = self.engine.find_template_loader('easymockups.models.Loader')
 
@@ -88,6 +87,10 @@ class Mockup(object):
 
 
 	def read_html_file(self):
+		'''
+		This basically is a wrapper that calls the associated loader's get_template() method, and sets 
+		a property called 'template_obj', which we can then use to render inside a view.
+		'''
 		try:
 			self.template_obj = self.loader.get_template(self.mockup_template_name)
 		except Exception as e:

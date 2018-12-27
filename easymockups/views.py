@@ -12,7 +12,6 @@ from django import template
 from .models import Mockup
 from django.template.base import Template
 from django.template.utils import get_app_template_dirs
-from pathlib import Path
 from django.template.response import TemplateResponse
 
 

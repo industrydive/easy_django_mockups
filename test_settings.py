@@ -59,7 +59,7 @@ ROOT_URLCONF = 'easymockups.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [DEFAULT_TEMPLATE_DIRECTORY, 'templates'],
+        'DIRS': [DEFAULT_TEMPLATE_DIRECTORY, 'easymockups'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
