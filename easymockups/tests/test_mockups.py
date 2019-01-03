@@ -39,9 +39,8 @@ class TestDebugTrue(TestCase):
         self.second_testsuite_urlpath = reverse('display_template', kwargs={'mockup_template_name': 'testsuitenojsonfile.html'})
         self.bad_testsuite_urlpath = reverse('display_template', kwargs={'mockup_template_name': 'nofile.html'})
 
-    @skip
     def test_response_200_with_json(self):
-        # Test the template renderinng works with the json file we created in the above lines
+        # Test the template renderinng works with the json file we have by the same name as the html file passed to the url
         resp = self.client.get(self.testsuite_urlpath)
         self.assertEqual(200, resp.status_code)
         self.assertIn('this is some test json!', resp.content.decode("utf-8"))
@@ -55,10 +54,9 @@ class TestDebugTrue(TestCase):
         self.assertIn('exclamation points!!  \n</body', resp.content.decode('utf-8'))
 
     def test_no_html_file(self):
-        # Test that removing the HTML file will cause the page to 404
+        # Test that not having an HTML file by the name of the value passed into the url will cause the page to 404
         resp = self.client.get(self.bad_testsuite_urlpath)
         self.assertEqual(404, resp.status_code)
-
 
     @override_settings(DEBUG=False)
     def test_debug_false_403(self):
@@ -71,18 +69,3 @@ class TestMockupModel(TestCase):
     def setUp(self):
         pass
 
-
-class TestJsonLoader(TestCase):
-    def setUp(self):
-        with open(json_file_path, 'w') as f:
-            json.dump({"testvar": "this is some test json!"}, f)
-
-    @skip
-    def test_file_open(self):
-        assertresults = {'testvar': 'this is some test json!'}
-        l = JSONLoader('testsuitefile.json')
-        l.load_json_to_dict()
-        json_contents = l.get_json()
-        self.assertEqual(assertresults, json_contents)
-
-#        print '\n\n\n html file path is {}'.format(html_file_path)

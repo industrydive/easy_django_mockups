@@ -33,7 +33,7 @@ class Loader(BaseLoader):
 		try:
 			with open(origin.name) as fp:
 				return fp.read()
-		except FileNotFoundError:
+		except IOError:#FileNotFoundError:
 			raise TemplateDoesNotExist(origin)
 		except Exception as e:
 			print 'HIT THE EXCEPTION IN GET_CONTENTS IN LOADER'
@@ -97,40 +97,20 @@ class Mockup(object):
 			self.template_obj = None
 
 	def load_related_json(self, filename_base):
-		try:
+		json_string = '{}'
 
-			loader = JSONLoader(filename_base + '.json')
-			loader.load_json_to_dict()
-			jsonstuff = loader.get_json()
+		try:
+			for origin in self.loader.get_template_sources(filename_base + '.json'):
+				try:
+					json_string = self.loader.get_contents(origin)
+				except Exception as e:
+					print 'Exception in load_related_json was {}'.format(e)
+#			loader = JSONLoader(filename_base + '.json')
+#			loader.load_json_to_dict()
+			jsonstuff = json.loads(json_string)
 			return jsonstuff
 
 		except (TemplateDoesNotExist, ValueError) as e:
 			if JSON_ERRORS_ENABLED:
 				self.error_message = 'JSON File appears to have some problems -- {}'.format(e)
 
-
-class JSONLoader(object):
-	use_os_path = False
-	use_template_loader = False
-
-	def __init__(self, json_path):
-		self.contents = '{}'
-		self.json = {}
-
-		paths = get_app_template_dirs('templates')
-		paths += get_app_template_dirs(MOCKUPS_DIR)
-
-		for path in paths:
-			thepath = os.path.join(path, json_path)
-			try:
-				with open(thepath, 'r') as f:
-					self.contents = f.read()
-			except Exception as e:
-				continue
-
-
-	def load_json_to_dict(self):
-		self.json = json.loads(self.contents)
-
-	def get_json(self):
-		return self.json
