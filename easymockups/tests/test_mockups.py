@@ -15,6 +15,7 @@ from unittest import skip
 
 django.setup()
 filename_base='testsuitefile'
+second_filename_base='testsuitenojsonfile'
 BASE_DIR = ''
 MOCKUPS_DIR = getattr(settings, 'MOCKUPS_DIR', '')
 
@@ -25,6 +26,9 @@ dirs = [os.path.join(dir, MOCKUPS_DIR) for dir in DIRS[0]['DIRS']]
 html_file_path = os.path.join(dirs[0], '{}.html'.format(filename_base))
 json_file_path = os.path.join(dirs[0], '{}.json'.format(filename_base))
 
+second_html_file_path = os.path.join(dirs[0], '{}.html'.format(second_filename_base))
+
+bad_html_file_path = os.path.join(dirs[0], '{}.html'.format('nofile'))
 print 'in test_mockups.py, html_file_path is, ', html_file_path
 
 
@@ -32,16 +36,8 @@ print 'in test_mockups.py, html_file_path is, ', html_file_path
 class TestDebugTrue(TestCase):
     def setUp(self):
         self.testsuite_urlpath = reverse('display_template', kwargs={'mockup_template_name': 'testsuitefile.html'})
-
-        with open(html_file_path, 'w') as f:
-            html_contents = """
-                <html><body>We should see the output from "testvar" in the json file
-                below after the exclamation points!! {{ testvar }} </body></html>
-                """
-            f.write(html_contents)
-
-        with open(json_file_path, 'w') as f:
-            json.dump({"testvar": "this is some test json!"}, f)
+        self.second_testsuite_urlpath = reverse('display_template', kwargs={'mockup_template_name': 'testsuitenojsonfile.html'})
+        self.bad_testsuite_urlpath = reverse('display_template', kwargs={'mockup_template_name': 'nofile.html'})
 
     @skip
     def test_response_200_with_json(self):
@@ -50,32 +46,22 @@ class TestDebugTrue(TestCase):
         self.assertEqual(200, resp.status_code)
         self.assertIn('this is some test json!', resp.content.decode("utf-8"))
 
-
-#    @skip
     def test_no_json_file(self):
-        # Test taht even though we remove the json file, we sill get a valid reesponse bc the HTML file still exists
+        # Test taht even though we have no json file, we sill get a valid reesponse bc the HTML file still exists
         # We only test for a substring at the end of the html_contents string because the django renderer
         # should have stripped out the {{ testvar }} part during renderinng, since the json object doesnt exist any more
-        os.remove(json_file_path)
-        resp = self.client.get(self.testsuite_urlpath)
+        resp = self.client.get(self.second_testsuite_urlpath)
         self.assertEqual(200, resp.status_code)
-        self.assertIn('exclamation points!!  </body', resp.content.decode('utf-8'))
+        self.assertIn('exclamation points!!  \n</body', resp.content.decode('utf-8'))
 
-#    @skip
     def test_no_html_file(self):
         # Test that removing the HTML file will cause the page to 404
-        import os
-        cwd = os.getcwd()
-        os.remove(html_file_path)
-        resp = self.client.get(self.testsuite_urlpath)
+        resp = self.client.get(self.bad_testsuite_urlpath)
         self.assertEqual(404, resp.status_code)
-        os.remove(json_file_path)
 
 
-#    @skip
     @override_settings(DEBUG=False)
     def test_debug_false_403(self):
-#        print '\n\n\n\n NOW TRYING TEST DEBUG FALSE 403'
         resp = self.client.get(self.testsuite_urlpath)
         self.assertEqual(403, resp.status_code)
         self.assertNotIn('this is some test json!', resp.content.decode("utf-8"))
@@ -100,5 +86,3 @@ class TestJsonLoader(TestCase):
         self.assertEqual(assertresults, json_contents)
 
 #        print '\n\n\n html file path is {}'.format(html_file_path)
-        os.remove(html_file_path)
-        os.remove(json_file_path)
