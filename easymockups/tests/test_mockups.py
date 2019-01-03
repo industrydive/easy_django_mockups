@@ -8,7 +8,7 @@ from django.urls import reverse
 import os.path
 from django.template import TemplateDoesNotExist
 import json
-from easymockups.models import Mockup, JSONLoader
+from easymockups.models import Mockup
 from django.apps import apps
 from unittest import skip
 
