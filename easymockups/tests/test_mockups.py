@@ -16,20 +16,6 @@ from unittest import skip
 django.setup()
 filename_base='testsuitefile'
 second_filename_base='testsuitenojsonfile'
-BASE_DIR = ''
-MOCKUPS_DIR = getattr(settings, 'MOCKUPS_DIR', '')
-
-DIRS = getattr(settings, 'TEMPLATES', [])
-dirs = [os.path.join(dir, MOCKUPS_DIR) for dir in DIRS[0]['DIRS']]
-
-
-html_file_path = os.path.join(dirs[0], '{}.html'.format(filename_base))
-json_file_path = os.path.join(dirs[0], '{}.json'.format(filename_base))
-
-second_html_file_path = os.path.join(dirs[0], '{}.html'.format(second_filename_base))
-
-bad_html_file_path = os.path.join(dirs[0], '{}.html'.format('nofile'))
-
 
 
 class TestDebugTrue(TestCase):
