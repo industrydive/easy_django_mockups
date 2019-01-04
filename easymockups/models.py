@@ -57,7 +57,7 @@ class Loader(BaseLoader):
 		# print 'DIRS IN GET_TEMPLATE_SOURCES() IS, ', dirs
 		for template_dir in dirs:
 			try:
-				name = safe_join(template_dir, template_name)
+				name = safe_join(template_dir, MOCKUPS_DIR, template_name)
 			except SuspiciousFileOperation:
 				# The joined path was located outside of this template_dir
 				# (it might be inside another one, so this isn't fatal).
@@ -77,11 +77,10 @@ class Mockup(object):
 
 
 		TEMPLATE_DIRS = getattr(settings, 'TEMPLATES', [])
-		dirs = [os.path.join(dir, MOCKUPS_DIR) for dir in TEMPLATE_DIRS[0]['DIRS']]
+		dirs = TEMPLATE_DIRS[0]['DIRS']
 
-		# THis turns out to be the key. We are manually finding out which dirs to pass to Engine
-		# which lets get_template_sources() find the templates correctly. could probably override
-		# get_template_sources() to find better templates
+		# Pass the directories specified in a django project's settings file directly to the Engine and then inside there
+		# we use safe_join to insert the MOCKUPS_DIR (also specified in their settings) in between the template dir and the template name
 		self.engine = Engine(dirs=dirs, app_dirs=True)
 		self.loader = self.engine.find_template_loader('easymockups.models.Loader')
 
