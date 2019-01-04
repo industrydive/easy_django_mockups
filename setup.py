@@ -15,7 +15,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     license='BSD License',  # example license
-    description='A simple Django app to conduct Web-based polls.',
+    description='A simple Django app to allow for quick protyping of templates without a need for a corresponding Django View.',
     long_description=README,
     url='https://www.example.com/',
     author='Your Name',

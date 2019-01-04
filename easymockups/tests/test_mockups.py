@@ -6,7 +6,7 @@ from easymockups.views import display_template
 import test_settings
 from django.urls import reverse
 import os.path
-from django.template import TemplateDoesNotExist
+from django.template import TemplateDoesNotExist, Context
 import json
 from easymockups.models import Mockup
 from django.apps import apps
@@ -29,7 +29,6 @@ json_file_path = os.path.join(dirs[0], '{}.json'.format(filename_base))
 second_html_file_path = os.path.join(dirs[0], '{}.html'.format(second_filename_base))
 
 bad_html_file_path = os.path.join(dirs[0], '{}.html'.format('nofile'))
-print 'in test_mockups.py, html_file_path is, ', html_file_path
 
 
 
@@ -67,5 +66,23 @@ class TestDebugTrue(TestCase):
 
 class TestMockupModel(TestCase):
     def setUp(self):
-        pass
+        self.mock = Mockup(filename_base + '.html')
 
+    def test_sets_template_obj(self):
+        # this should set mock.template_obj to an instance of a django Template model
+        self.mock.read_html_file()
+        self.assertIsNotNone(self.mock.template_obj)
+
+    def test_render_template_works(self):
+        context = Context({})
+        self.mock.read_html_file()
+        self.assertIn('the exclamation points!!  \n</body', self.mock.template_obj.render(context))
+
+    def test_json_loading_works(self):
+        json_stuff = self.mock.load_related_json(filename_base)
+        self.assertEqual({"testvar": "this is some test json!"}, json_stuff)
+
+#        if json_stuff:
+#            context.update(json_stuff)
+#        elif mock.error_message:
+#            messages.add_message(request, messages.ERROR, mock.error_message)

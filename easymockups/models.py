@@ -30,14 +30,16 @@ from django.template.base import Origin
 class Loader(BaseLoader):
 
 	def get_contents(self, origin):
+		# print 'TRYING TO GET_CONTENTS()'
 		try:
 			with open(origin.name) as fp:
 				return fp.read()
 		except IOError:#FileNotFoundError:
 			raise TemplateDoesNotExist(origin)
 		except Exception as e:
-			print 'HIT THE EXCEPTION IN GET_CONTENTS IN LOADER'
-			print 'exception was, ', e
+			pass
+			# print 'HIT THE EXCEPTION IN GET_CONTENTS IN LOADER'
+			# print 'exception was, ', e
 
 
 	def get_template_sources(self, template_name):
@@ -51,6 +53,8 @@ class Loader(BaseLoader):
 		else:
 			dirs = self.engine.dirs
 
+
+		# print 'DIRS IN GET_TEMPLATE_SOURCES() IS, ', dirs
 		for template_dir in dirs:
 			try:
 				name = safe_join(template_dir, template_name)
@@ -104,9 +108,8 @@ class Mockup(object):
 				try:
 					json_string = self.loader.get_contents(origin)
 				except Exception as e:
-					print 'Exception in load_related_json was {}'.format(e)
-#			loader = JSONLoader(filename_base + '.json')
-#			loader.load_json_to_dict()
+					# print 'Exception in load_related_json was {}'.format(e)
+					pass
 			jsonstuff = json.loads(json_string)
 			return jsonstuff
 
