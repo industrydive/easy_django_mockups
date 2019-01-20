@@ -32,14 +32,12 @@ def display_template(request, mockup_template_name):
 	else:
 		return HttpResponse(status=404)
 
-
-	json_stuff = mock.load_related_json(json_filename)
-	if json_stuff:
-		context.update(json_stuff)
+	mock.load_related_json(json_filename)
+	if mock.json:
+		context.update(mock.json)
 	elif mock.error_message:
 		messages.add_message(request, messages.ERROR, mock.error_message)
  
-
 	try:
 		return HttpResponse(template.render(context))
 	except TemplateDoesNotExist as error:

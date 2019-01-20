@@ -1,8 +1,9 @@
 import json
 from django.conf import settings
-from django.template import Origin, TemplateDoesNotExist, Engine
+from django.template import Origin, TemplateDoesNotExist, Engine, Context
 from django.template.loaders.base import Loader as BaseLoader
 from django.utils._os import safe_join
+
 
 if hasattr(settings, 'MOCKUPS_DIR'):
     MOCKUPS_DIR = settings.MOCKUPS_DIR
@@ -13,6 +14,10 @@ if hasattr(settings, 'JSON_ERRORS_ENABLED'):
     JSON_ERRORS_ENABLED = settings.JSON_ERRORS_ENABLED
 else:
     JSON_ERRORS_ENABLED = True
+
+# Get the directories templatees are located in from the django instance's settings
+TEMPLATE_DIRS = getattr(settings, 'TEMPLATES', [])
+dirs = TEMPLATE_DIRS[0]['DIRS']
 
 
 class Loader(BaseLoader):
@@ -61,9 +66,6 @@ class Mockup(object):
         self.json = None
         self.error_message = None
 
-        TEMPLATE_DIRS = getattr(settings, 'TEMPLATES', [])
-        dirs = TEMPLATE_DIRS[0]['DIRS']
-
         # Pass the directories specified in a django project's settings file directly to the Engine and then inside there
         # we use safe_join to insert the MOCKUPS_DIR (also specified in their settings) in between the template dir and the template name
         self.engine = Engine(dirs=dirs, app_dirs=True)
@@ -83,19 +85,16 @@ class Mockup(object):
             self.template_obj = None
 
     def load_related_json(self, filename_base):
-        json_string = '{}'
+        # We instantiate an empty Context() object just to use so we can render the json template
+        # This is probably not the best way to do this, but it's how it is for now.
+        # TODO: make this better
+        context = Context({})
 
         try:
-            for origin in self.loader.get_template_sources(filename_base + '.json'):
-                try:
-                    json_string = self.loader.get_contents(origin)
-                except Exception as e:
-                    # print 'Exception in load_related_json was {}'.format(e)
-                    pass
-            jsonstuff = json.loads(json_string)
-            return jsonstuff
-
-        except (TemplateDoesNotExist, ValueError) as e:
-            if JSON_ERRORS_ENABLED:
-                self.error_message = 'JSON File appears to have some problems -- {}'.format(e)
-
+            jsontemplate = self.loader.get_template(filename_base + '.json')
+            jsonstuff = jsontemplate.render(context)
+            self.json = json.loads(jsonstuff)
+        except TemplateDoesNotExist:
+            self.error_message = 'No JSON file with name {}.json found'.format(filename_base)
+        except ValueError:
+            self.error_message = 'JSON file appears to have some problems'

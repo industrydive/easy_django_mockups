@@ -65,8 +65,8 @@ class TestMockupModel(TestCase):
         self.assertIn('the exclamation points!!  \n</body', self.mock.template_obj.render(context))
 
     def test_json_loading_works(self):
-        json_stuff = self.mock.load_related_json(filename_base)
-        self.assertEqual({"testvar": "this is some test json!"}, json_stuff)
+        self.mock.load_related_json(filename_base)
+        self.assertEqual({"testvar": "this is some test json!"}, self.mock.json)
 
 #        if json_stuff:
 #            context.update(json_stuff)
