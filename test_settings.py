@@ -12,9 +12,12 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+import os.path
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+DEFAULT_TEMPLATE_DIRECTORY = os.path.join(PROJECT_ROOT, 'templates')
 
 
 # Quick-start development settings - unsuitable for production
@@ -38,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'easymockups',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +59,7 @@ ROOT_URLCONF = 'easymockups.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['easymockups'],
+        'DIRS': [DEFAULT_TEMPLATE_DIRECTORY, 'mockups'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
