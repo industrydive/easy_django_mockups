@@ -67,8 +67,3 @@ class TestMockupModel(TestCase):
     def test_json_loading_works(self):
         self.mock.load_related_json(filename_base)
         self.assertEqual({"testvar": "this is some test json!"}, self.mock.json)
-
-#        if json_stuff:
-#            context.update(json_stuff)
-#        elif mock.error_message:
-#            messages.add_message(request, messages.ERROR, mock.error_message)
