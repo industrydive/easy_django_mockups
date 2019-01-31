@@ -7,6 +7,9 @@ Hello! And thanks for reading our contributing page, which hopefully means you'r
  * Probably more
 
 
+Our policy regarding changes to the code or documentation in the repo is that it must be through a Pull Request, and that said Pull Request must be reviewed by one of our maintainers.
+
+
 To contribute code to this project, 
 
  * clone the repository
@@ -14,6 +17,7 @@ To contribute code to this project,
  * install requirements.txt
  * make your changes
  * ensure tests pass
+ * if you add new code, make sure you write new tests to cover the new code
  * create a PR and fill out the PR template
 
 
