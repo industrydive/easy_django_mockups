@@ -1,0 +1,6 @@
+recursive-exclude tests tests.py
+recursive-exclude migrations
+recursive-exclude templates
+exclude tests.py
+global-exclude test_mockups.py
+global-exclude tests.py
