@@ -1,2 +1,2 @@
 from easymockups.urls import urlpatterns
-name = 'easymockups'
+name = 'easy-django-mockups'

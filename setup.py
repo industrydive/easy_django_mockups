@@ -8,8 +8,8 @@ with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
-    name='easymockups',
-    version='0.1',
+    name='easy-django-mockups',
+    version='0.1.1',
     packages=find_packages(exclude=['tests', 'easymockups.migrations', 'templates']),
     license='BSD License',  # example license
     description='A simple Django app to allow for quick protyping of templates without a need for a corresponding Django View.',
