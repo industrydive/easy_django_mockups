@@ -1,4 +1,4 @@
-Django==1.11
+Django==1.11.29
 filelock==3.0.9
 nose==1.3.7
 pathlib==1.0.1
